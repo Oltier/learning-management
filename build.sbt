@@ -47,7 +47,8 @@ libraryDependencies ++=
   akkaDependencies ++
     configDependencies ++
     testDependencies ++
-    configDependencies
+    configDependencies ++
+    dbDependencies
 
 lazy val root =
   Project(id = "learning-management", base = file("."))
