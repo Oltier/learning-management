@@ -1,13 +1,15 @@
 package hu.elte.inf.learningmanagement.repository
 
+import com.byteslounge.slickrepo.meta.Keyed
 import com.byteslounge.slickrepo.repository.Repository
+import com.github.tototoshi.slick.GenericJodaSupport
 import hu.elte.inf.learningmanagement.model.enum.SubmissionStatus
 import hu.elte.inf.learningmanagement.model.{Task, User, UserTask}
 import slick.ast.BaseTypedType
 import slick.jdbc.JdbcProfile
 import slick.lifted.{ForeignKeyQuery, ProvenShape}
 
-class UsersTasksRepository(implicit override val driver: JdbcProfile) extends Repository[UserTask, Long](driver) {
+class UsersTasksRepository(implicit override val driver: JdbcProfile, jodaSupport: GenericJodaSupport) extends Repository[UserTask, Long](driver) {
 
   import driver.api._
 
@@ -26,25 +28,31 @@ class UsersTasksRepository(implicit override val driver: JdbcProfile) extends Re
 	  	.result
 	  	.headOption
 
+	def findByUserId(userId: Long): DBIO[Seq[UserTask]] =
+		tableQuery
+			.filter(_.userId === userId)
+			.result
+
 	def update(userTask: UserTask): DBIO[Int] =
 		tableQuery
   		.filter(_.userId === userTask.userId)
   		.filter(_.taskId === userTask.taskId)
 			.update(userTask)
 
-  private[repository] class UsersTasksTable(tag: Tag) extends Table[UserTask](tag, "users_tasks") {
+  private[repository] class UsersTasksTable(tag: Tag) extends Table[UserTask](tag, "users_tasks") with Keyed[Long] {
 
     def userId: Rep[Long] = column[Long]("user_id")
     def taskId: Rep[Long] = column[Long]("task_id")
     def submissionStatus: Rep[SubmissionStatus.EnumType] = column[SubmissionStatus.EnumType]("submission_status", O.Length(length = 255, varying = true))
     def answer: Rep[String] = column[String]("answer")
+		def id: Rep[Long] = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
-    def pk = primaryKey("primaryKey", (userId, taskId))
+    def uniqueUserIdTaskId = index("unique_user_id_task_id", (userId, taskId), unique = true)
 
     def userFk: ForeignKeyQuery[userRepo.UserTable, User] = foreignKey("fk_user", userId, userTable)(_.id, onDelete = ForeignKeyAction.Cascade)
 
     def taskFk: ForeignKeyQuery[taskRepo.TaskTable, Task] = foreignKey("fk_task", taskId, taskTable)(_.id, onDelete = ForeignKeyAction.Cascade)
 
-    override def * : ProvenShape[UserTask] = (userId, taskId, submissionStatus, answer) <> (UserTask.tupled, UserTask.unapply)
+    override def * : ProvenShape[UserTask] = (userId, taskId, submissionStatus, answer, id.?) <> (UserTask.tupled, UserTask.unapply)
   }
 }

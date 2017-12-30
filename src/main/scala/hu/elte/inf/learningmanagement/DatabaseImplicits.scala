@@ -6,6 +6,12 @@ import slick.jdbc.{JdbcBackend, JdbcProfile}
 
 import scala.concurrent.duration._
 
+trait DatabaseImplicits {
+	implicit val implicitJdbcProfile: JdbcProfile
+	implicit val jodaSupport: GenericJodaSupport
+	implicit val db: JdbcBackend#DatabaseDef
+}
+
 object DatabaseImplicits {
 	val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("database")
 
