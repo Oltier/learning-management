@@ -7,4 +7,6 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol with JodaTim
   implicit val taskListDtoFormat: RootJsonFormat[TaskListDto] = jsonFormat5(TaskListDto)
   implicit val taskListDtoSeqFormat: RootJsonFormat[TaskListDtoSeq] = jsonFormat1(TaskListDtoSeq)
   implicit val taskDetailsDtoFormat: RootJsonFormat[TaskDetailsDto] = jsonFormat6(TaskDetailsDto)
+  implicit val submitSolutionDto: RootJsonFormat[SubmitSolutionDto] = jsonFormat1(SubmitSolutionDto)
+  implicit val loginDto: RootJsonFormat[LoginDto] = jsonFormat1(LoginDto)
 }

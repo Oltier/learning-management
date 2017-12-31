@@ -26,12 +26,19 @@ class UsersTasksRepository(implicit override val driver: JdbcProfile, jodaSuppor
 
   def destroy(): DBIO[Unit] = tableQuery.schema.drop
 
-  def findByUserIdAndTaskId(userId: Long, taskId: Long): DBIO[Option[(UserTask, Task)]] =
+  def findByUserIdAndTaskIdWithTask(userId: Long, taskId: Long): DBIO[Option[(UserTask, Task)]] =
     tableQuery
       .filter(_.userId === userId)
       .filter(_.taskId === taskId)
       .join(TableQuery[taskRepo.TaskTable])
       .on(_.taskId === _.id)
+      .result
+      .headOption
+
+  def findByUserIdAndTaskId(userId: Long, taskId: Long): DBIO[Option[UserTask]] =
+    tableQuery
+      .filter(_.userId === userId)
+      .filter(_.taskId === taskId)
       .result
       .headOption
 

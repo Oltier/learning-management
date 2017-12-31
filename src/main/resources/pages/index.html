@@ -1,0 +1,215 @@
+<html>
+<head>
+</head>
+<body>
+<script src="./jquery.min.js"></script>
+<script src="./js-cookie.js"></script>
+
+<h1>Learning Management System</h1>
+
+<form id="login_form">
+    <p>
+        Login: <input type="text" name="username" id="username"/>
+    </p>
+    <p>
+        Password: <input type="password" name="password" id="password"/>
+    </p>
+    <input type="submit" value="Login" id="do_login"/>
+</form>
+
+<div id="task_list">
+    <table id="task_list_table">
+        <thead>
+        <tr>
+            <th>Task Id</th>
+            <th>Name</th>
+            <th>Submission Start</th>
+            <th>Submission End</th>
+            <th>Submission Status</th>
+        </tr>
+        </thead>
+        <tbody id="task_list_table_body">
+
+        </tbody>
+    </table>
+</div>
+
+<!--<div id="task">-->
+    <!--<h2>Submit solution</h2>-->
+    <!--<p id="taskId"></p>-->
+    <!--<p id="name"></p>-->
+    <!--<p id="submissionStart"></p>-->
+    <!--<p id="submissionEnd"></p>-->
+    <!--<p id="submissionStatus"></p>-->
+    <!--<p id="answer"></p>-->
+<!--</div>-->
+
+<form id="logout_form">
+    <input type="submit" value="Logout" id="do_logout"/>
+</form>
+
+<script>
+    var $loginForm = $('#login_form');
+    var $logoutForm = $('#logout_form');
+    var $taskList = $('#task_list');
+    var $taskListTableBody = $('#task_list_table_body')
+    $loginForm.hide();
+    $logoutForm.hide();
+
+    function handleResponse(data, status) {
+        if (status === 'success') {
+            $loginForm.hide();
+            $taskList.show();
+            $logoutForm.show();
+        } else {
+            $loginForm.show();
+            $logoutForm.hide();
+            $taskList.hide();
+        }
+    }
+
+    function handleListResponse(data, status) {
+        if (status === 'success') {
+            $loginForm.hide();
+            $logoutForm.show();
+            $taskListTableBody.empty();
+            $(function () {
+                $.each(data, function (i, item) {
+                    var now = new Date($.now());
+                    var submissionStart = new Date(item.submissionStart.replace(" ", "T"));
+                    var submissionEnd = new Date(item.submissionEnd.replace(" ", "T"));
+
+                    var idATag = $('<a>', {
+                        href: '/api/task/' + item.taskId,
+                        id: 'taskView' + item.taskId
+                    }).text(item.taskId);
+                    var revokeSubmissionATag = $('<a>', {
+                        href: '/api/task/' + item.taskId,
+                        id: 'taskRevoke' + item.taskId
+                    }).text('Revoke submission');
+
+                    var $tr = $('<tr>').append(
+                        $('<td>').append(idATag),
+                        $('<td>').text(item.name),
+                        $('<td>').text(item.submissionStart),
+                        $('<td>').text(item.submissionEnd),
+                        $('<td>').text(item.submissionStatus)
+                    );
+
+                    if (item.submissionStatus === 'SUBMITTED' && submissionStart < now && submissionEnd > now) {
+                        $tr.append(
+                            $('<td>').append(revokeSubmissionATag)
+                        )
+                    }
+
+                    $taskListTableBody.append($tr)
+
+                    $('#taskRevoke' + item.taskId).click(function (e) {
+                        function ajax() {
+                            var revokeUrl = $('#taskRevoke' + item.taskId).attr("href");
+                            return $.ajax(addCsrfHeader({
+                                url: revokeUrl,
+                                type: 'DELETE',
+                                processData: false,
+                                contentType: false
+                            }))
+                        }
+
+                        $.when(ajax()).done(getTaskList);
+                        e.preventDefault();
+                        return false;
+                    });
+
+                    $('#taskView' + item.taskId).click(function (e) {
+                        function ajax() {
+                            var viewTaskUrl = $('#taskRevoke' + item.taskId).attr("href");
+                            return $.ajax(addCsrfHeader({
+                                url: viewTaskUrl,
+                                type: 'GET',
+                                processData: false,
+                                contentType: false
+                            }))
+                        }
+
+                        $.when(ajax()).done(getTaskList);
+                        e.preventDefault();
+                        return false;
+                    });
+
+                });
+            });
+
+            $taskList.show();
+        } else {
+            $loginForm.show();
+            $logoutForm.hide();
+            $taskList.hide();
+        }
+    }
+
+    function getCurrentLogin() {
+        $.ajax(addCsrfHeader({
+            url: '/api/current_login',
+            type: 'GET',
+            success: handleResponse,
+            error: handleResponse
+        }));
+    }
+
+    function getTaskList() {
+        $.ajax(addCsrfHeader({
+            url: '/api/task/list',
+            type: 'GET',
+            success: handleListResponse,
+            error: handleListResponse
+        }));
+    }
+
+    getTaskList();
+    getCurrentLogin();
+
+    $('#do_login').click(function (e) {
+        var form = document.getElementById("login_form");
+        var data = new FormData(form);
+
+        function ajax() {
+            return $.ajax(addCsrfHeader({
+                url: '/api/do_login',
+                type: 'POST',
+                data: data,
+                processData: false,
+                contentType: false
+            }))
+        }
+
+        $.when(ajax()).done(getTaskList);
+        e.preventDefault();
+        return false;
+    });
+
+    $('#do_logout').click(function (e) {
+        $.ajax(addCsrfHeader({
+            url: '/api/do_logout',
+            type: 'POST',
+            success: getCurrentLogin
+        }));
+        e.preventDefault();
+        return false;
+    });
+
+    function addCsrfHeader(opts) {
+        var token = Cookies.get('XSRF-TOKEN');
+        if (token) {
+            console.log('Setting csrf token: ' + token);
+            opts['headers'] = {
+                'X-XSRF-TOKEN': token
+            }
+        } else {
+            console.log('No csrf token');
+        }
+
+        return opts;
+    }
+</script>
+</body>
+</html>

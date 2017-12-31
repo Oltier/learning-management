@@ -44,5 +44,13 @@ object ExampleUsersTasks {
     answer = "I firmly believe that creating something round-ish stuff will be an amazing idea."
   )
 
-  val usersTasks = Seq(notSubmittedTask1User1, notSubmittedTask1User3, notSubmittedTask1User2, submittedTask2User1, notSubmittedTask2User2, SubmittedTask4User1)
+  val usersTasks = Seq(
+    notSubmittedTask1User1,
+    notSubmittedTask1User3,
+    notSubmittedTask1User2,
+    submittedTask2User1,
+    notSubmittedTask3User1,
+    notSubmittedTask2User2,
+    SubmittedTask4User1
+  )
 }

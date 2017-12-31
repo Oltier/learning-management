@@ -1,5 +1,6 @@
 package hu.elte.inf.learningmanagement.config
 
+import com.softwaremill.session.SessionConfig
 import pureconfig.{CamelCase, ConfigFieldMapping, ProductHint}
 import pureconfig.loadConfigOrThrow
 
@@ -13,5 +14,7 @@ object ApplicationProperties {
 
 	lazy val SERVER: Server = loadConfigOrThrow[Server]("server")
 	lazy val JWT: Jwt = loadConfigOrThrow[Jwt]("jwt")
+
+  val sessionConfig = SessionConfig.default(JWT.secret)
 
 }

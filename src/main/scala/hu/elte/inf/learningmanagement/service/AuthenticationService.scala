@@ -27,7 +27,8 @@ class DefaultAuthenticationService(implicit injector: Injector, ec: ExecutionCon
     db.run(userRepo.findByUserName(userName))
 	  	.map(
 				_.filter(user => password.isBcrypted(user.password))
-			  	.map(user => LoginResponseDto(Jwt.encode(JwtPayload(user.id.get))))
+//			  	.map(user => LoginResponseDto(Jwt.encode(JwtPayload(user.id.get))))
+			  	.map(user => LoginResponseDto(user.id.get))
 			)
   }
 

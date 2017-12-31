@@ -6,7 +6,7 @@ import com.github.t3hnar.bcrypt.Password
 object ExampleUsers {
 
   val user1 = User(
-    userName = "ce0ta1",
+    userName = "ce0ta3",
     password = "12345".bcrypt
   )
   val user2 = User(
@@ -14,7 +14,7 @@ object ExampleUsers {
     password = "123456".bcrypt
   )
   val user3 = User(
-    userName = "ce0ta3",
+    userName = "ce0ta1",
     password = "1234567".bcrypt
   )
 

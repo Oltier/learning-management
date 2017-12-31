@@ -14,7 +14,9 @@ val slickVersion = "3.2.1"
 val akkaDependencies = Seq(
   "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
   "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
-  "ch.megard" %% "akka-http-cors" % "0.2.2"
+  "ch.megard" %% "akka-http-cors" % "0.2.2",
+  "com.softwaremill.akka-http-session" %% "core" % "0.5.1",
+  "com.softwaremill.akka-http-session" %% "jwt"  % "0.5.1"
 )
 
 val dbDependencies = Seq(

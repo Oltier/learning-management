@@ -18,4 +18,9 @@ package object api {
       answer: String
   )
 
+  final case class SubmitSolutionDto(answer: String)
+
+//  final case class LoginDto(username: String, password: String)
+  final case class LoginDto(username: String)
+
 }

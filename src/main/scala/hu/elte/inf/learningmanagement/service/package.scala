@@ -10,4 +10,5 @@ package object service {
 	}
 
 	case class EntityNotFound(message: String) extends ErrorResponse(message)
+  case class DatabaseOperationFailed(message: String) extends ErrorResponse(message)
 }
