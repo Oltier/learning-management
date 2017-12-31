@@ -8,4 +8,6 @@ package object service {
 	sealed abstract class ErrorResponse(message: String) {
 		def getMessage: String = message
 	}
+
+	case class EntityNotFound(message: String) extends ErrorResponse(message)
 }

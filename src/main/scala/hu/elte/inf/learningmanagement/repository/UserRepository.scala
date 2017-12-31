@@ -7,6 +7,7 @@ import hu.elte.inf.learningmanagement.model.{User, UserTask}
 import slick.ast.BaseTypedType
 import slick.jdbc.JdbcProfile
 import slick.lifted.ProvenShape
+import language.postfixOps
 
 class UserRepository(implicit override val driver: JdbcProfile, jodaSupport: GenericJodaSupport) extends Repository[User, Long](driver) {
 
