@@ -12,7 +12,7 @@ trait DatabaseImplicits {
 	implicit val db: JdbcBackend#DatabaseDef
 }
 
-object DatabaseImplicits {
+object DatabaseImplicits extends DatabaseImplicits {
 	val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("database")
 
 	implicit val implicitJdbcProfile: JdbcProfile = dbConfig.profile

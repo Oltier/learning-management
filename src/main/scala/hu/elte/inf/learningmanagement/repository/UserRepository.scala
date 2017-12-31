@@ -13,9 +13,6 @@ class UserRepository(implicit override val driver: JdbcProfile, jodaSupport: Gen
 
   import driver.api._
 
-  val usersTasks = new UsersTasksRepository()
-  val usersTasksTable: TableQuery[usersTasks.UsersTasksTable] = TableQuery[usersTasks.UsersTasksTable]
-
   val pkType: BaseTypedType[Long] = implicitly[BaseTypedType[Long]]
   val tableQuery = TableQuery[UserTable]
   override type TableType = UserTable
@@ -31,9 +28,6 @@ class UserRepository(implicit override val driver: JdbcProfile, jodaSupport: Gen
       .filter(_.userName === userName)
       .result
       .headOption
-
-  def findUserWithTask(id: Long): DBIO[Seq[(User, UserTask)]] =
-    tableQuery filter (_.id === id) join TableQuery[usersTasks.UsersTasksTable] on (_.id === _.userId) result
 
   private[repository] class UserTable(tag: Tag) extends Table[User](tag, "user") with Keyed[Long] {
 
