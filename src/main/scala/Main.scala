@@ -7,9 +7,12 @@ import hu.elte.inf.learningmanagement.api.TaskApi
 import hu.elte.inf.learningmanagement.config.ApplicationProperties._
 import hu.elte.inf.learningmanagement.service.{DefaultAuthenticationService, DefaultJwtService, DefaultTaskService}
 import hu.elte.inf.learningmanagement.SystemImplicits._
+import hu.elte.inf.learningmanagement.init.LearningManagementInit
 import scaldi.{Injectable, Module}
 
 import scala.concurrent.Future
+import scala.io.StdIn
+import scala.util.Failure
 
 object MainModule extends Module {
   implicit val dbImplicits: DatabaseImplicits = DatabaseImplicits
@@ -32,6 +35,8 @@ object Main extends App with Injectable with Logging {
       }
     }
 
+
+
   val apiBindingFuture: Future[ServerBinding] =
     Http()
       .bindAndHandle(routes, SERVER.url, SERVER.port)
@@ -39,5 +44,14 @@ object Main extends App with Injectable with Logging {
         logger.info(s"Server started on ${SERVER.url}:${SERVER.port}")
         binding
       })
+
+  LearningManagementInit.dbInit() onComplete {
+    case Failure(e) => logger.error("Error during Database init ", e)
+    case _ =>
+  }
+
+  StdIn.readLine()
+  apiBindingFuture.flatMap(_.unbind())
+  system.terminate()
 
 }

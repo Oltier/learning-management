@@ -17,6 +17,10 @@ class TaskRepository(implicit override val driver: JdbcProfile, jodaSupport: Gen
   val tableQuery: TableQuery[TaskTable] = TableQuery[TaskTable]
   override type TableType = TaskTable
 
+  def init(): DBIO[Unit] = tableQuery.schema.create
+
+  def destroy(): DBIO[Unit] = tableQuery.schema.drop
+
   private[repository] class TaskTable(tag: Tag) extends Table[Task](tag, "task") with Keyed[Long] {
     def name: Rep[String] = column[String]("name", O.Length(length = 255, varying = true))
 

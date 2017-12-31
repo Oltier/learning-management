@@ -17,6 +17,10 @@ class UserRepository(implicit override val driver: JdbcProfile, jodaSupport: Gen
   val tableQuery = TableQuery[UserTable]
   override type TableType = UserTable
 
+  def init(): DBIO[Unit] = tableQuery.schema.create
+
+  def destroy(): DBIO[Unit] = tableQuery.schema.drop
+
   def findById(id: Long): DBIO[Option[User]] =
     tableQuery
       .filter(_.id === id)
